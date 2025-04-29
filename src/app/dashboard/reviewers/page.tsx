@@ -55,7 +55,7 @@ export default function Page(): React.JSX.Element {
           ...(searchQuery && { searchQuery: searchQuery })
         });
 
-        const response = await fetch(`http://localhost:4000/users?${params}`);
+        const response = await fetch(`http://localhost:4000/users/reviewers?${params}`);
         const data: ApiResponse = await response.json();
 
         setUsers(data.data.map(user => ({
@@ -92,7 +92,7 @@ export default function Page(): React.JSX.Element {
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Users</Typography>
+          <Typography variant="h4">Reviewers</Typography>
         </Stack>
       </Stack>
       <CustomersFilters

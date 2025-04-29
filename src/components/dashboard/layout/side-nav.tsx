@@ -50,20 +50,20 @@ export function SideNav(): React.JSX.Element {
         '&::-webkit-scrollbar': { display: 'none' },
       }}
     >
-      <Stack spacing={2} sx={{ p: 3 }}>
+      <Stack spacing={2} sx={{ p: 4 }}>
         <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
-          <Logo color="light" height={32} width={122} />
+          {/* LOGO */}
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems })}
+        {renderNavItemsNew({ pathname, items: navItems })}
       </Box>
     </Box>
   );
 }
 
-function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
+function renderNavItemsNew({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
   const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
@@ -73,9 +73,41 @@ function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pat
   }, []);
 
   return (
-    <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>
-      {children}
-    </Stack>
+    <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
+      {navItems.map((section, sectionIndex) => (
+        <React.Fragment key={section.label || `section-${sectionIndex}`}>
+          {section.label && (
+            <Typography
+              component="div"
+              variant="caption"
+              sx={{
+                color: 'var(--NavItem-color)',
+                px: 2,
+                py: 1,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
+            >
+              {section.label}
+            </Typography>
+          )}
+
+          <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>
+            {section.items.map((item) => (
+              <NavItem key={item.key} pathname={pathname} {...item} />
+            ))}
+          </Stack>
+
+          {sectionIndex < navItems.length - 1 && (
+            <Divider sx={{
+              borderColor: 'var(--mui-palette-neutral-700)',
+              my: 2
+            }} />
+          )}
+        </React.Fragment>
+      ))}
+    </Box>
   );
 }
 
