@@ -16,10 +16,17 @@ export const navItems: NavSection[] = [
   {
     label: 'Admin',
     items: [
-      { key: 'users', title: 'Users', href: paths.dashboard.users, icon: 'users' },
-      { key: 'admins', title: 'Admins', href: paths.dashboard.admins, icon: 'users' },
-      { key: 'editors', title: 'Editors', href: paths.dashboard.editors, icon: 'users' },
-      { key: 'reviewers', title: 'Reviewers', href: paths.dashboard.reviewers, icon: 'users' },
+      {
+        key: 'users',
+        title: 'Users',
+        icon: 'users',
+        href: paths.dashboard.users,
+        items: [
+          { key: 'admins', title: 'Admins', href: paths.dashboard.admins, icon: 'shield' },
+          { key: 'editors', title: 'Editors', href: paths.dashboard.editors, icon: 'pencil-simple' },
+          { key: 'reviewers', title: 'Reviewers', href: paths.dashboard.reviewers, icon: 'magnifying-glass' },
+        ],
+      },
     ],
   },
   {
@@ -30,6 +37,7 @@ export const navItems: NavSection[] = [
     ],
   },
 ];
+
 
 /*
 export const navItems = [

@@ -15,6 +15,13 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import dayjs from 'dayjs';
 
 import { useSelection } from '@/hooks/use-selection';
@@ -32,6 +39,9 @@ export function CustomersTable({
   page = 0,
   rowsPerPage = 0,
 }: CustomersTableProps): React.JSX.Element {
+  const [openModal, setOpenModal] = React.useState(false);
+  const [selectedCustomer, setSelectedCustomer] = React.useState<Customer | null>(null);
+
   const rowIds = React.useMemo(() => {
     return rows.map((customer) => customer.id);
   }, [rows]);
@@ -42,64 +52,141 @@ export function CustomersTable({
   const selectedAll = rows.length > 0 && selected?.size === rows.length;
 
   return (
-    <Card>
-      <Box sx={{ overflowX: 'auto' }}>
-        <Table sx={{ minWidth: '800px' }}>
-          <TableHead>
-            <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={selectedAll}
-                  indeterminate={selectedSome}
-                  onChange={(event) => {
-                    if (event.target.checked) {
-                      selectAll();
-                    } else {
-                      deselectAll();
-                    }
-                  }}
-                />
-              </TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Profile created</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => {
-              const isSelected = selected?.has(row.id);
+    <>
+      <Card>
+        <Box sx={{ overflowX: 'auto' }}>
+          <Table sx={{ minWidth: '800px' }}>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selectedAll}
+                    indeterminate={selectedSome}
+                    onChange={(event) => {
+                      if (event.target.checked) {
+                        selectAll();
+                      } else {
+                        deselectAll();
+                      }
+                    }}
+                  />
+                </TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Profile created</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => {
+                const isSelected = selected?.has(row.id);
 
-              return (
-                <TableRow hover key={row.id} selected={isSelected}>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          selectOne(row.id);
-                        } else {
-                          deselectOne(row.id);
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>{row.name}</TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: '4px' }}>
-                      {row.roles.map((role) => (
-                        <Chip key={role} label={role} variant="outlined" size="small" />
-                      ))}
-                    </Stack>
-                  </TableCell>
-                  <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </Box>
-    </Card>
+                return (
+                  <TableRow
+                    hover
+                    key={row.id}
+                    selected={isSelected}
+                    onClick={() => {
+                      setSelectedCustomer(row);
+                      setOpenModal(true);
+                    }}
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={isSelected}
+                        onChange={(event) => {
+                          if (event.target.checked) {
+                            selectOne(row.id);
+                          } else {
+                            deselectOne(row.id);
+                          }
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>{row.name}</TableCell>
+                    <TableCell>{row.email}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: '4px' }}>
+                        {row.roles.map((role) => (
+                          <Chip key={role} label={role} variant="outlined" size="small" />
+                        ))}
+                      </Stack>
+                    </TableCell>
+                    <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Box>
+      </Card>
+      <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Edit Account</DialogTitle>
+        <DialogContent dividers sx={{ p: 4 }}>
+          {selectedCustomer && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              <TextField
+                label="Name"
+                value={selectedCustomer.name}
+                onChange={(e) =>
+                  setSelectedCustomer({ ...selectedCustomer, name: e.target.value })
+                }
+                fullWidth
+              />
+              <TextField
+                label="Email"
+                value={selectedCustomer.email}
+                onChange={(e) =>
+                  setSelectedCustomer({ ...selectedCustomer, email: e.target.value })
+                }
+                fullWidth
+              />
+              <Autocomplete
+                multiple
+                options={['ADMIN', 'EDITOR', 'REVIEWER']}
+                value={selectedCustomer.roles}
+                onChange={(_, newValue) =>
+                  setSelectedCustomer({ ...selectedCustomer, roles: newValue })
+                }
+                renderInput={(params) => <TextField {...params} label="Roles" />}
+              />
+              <Divider />
+              <TextField
+                label="Profile Created"
+                value={dayjs(selectedCustomer.createdAt).format('MMM D, YYYY')}
+                InputProps={{ readOnly: true, disabled: true }}
+                fullWidth
+              />
+              <TextField
+                label="Last Profile Update"
+                value={dayjs(selectedCustomer.updatedAt).format('MMM D, YYYY')}
+                InputProps={{ readOnly: true, disabled: true }}
+                fullWidth
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'space-between', px: 4, py: 2 }}>
+          <Button color="error" variant="outlined" onClick={() => {
+            // Delete logic
+            setOpenModal(false);
+          }}>
+            Delete
+          </Button>
+          <Box>
+            <Button onClick={() => setOpenModal(false)} sx={{ mr: 1 }}>
+              Cancel
+            </Button>
+            <Button variant="contained" onClick={() => {
+              // Save logic
+              setOpenModal(false);
+            }}>
+              Save Changes
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }

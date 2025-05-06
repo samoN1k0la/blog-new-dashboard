@@ -13,6 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Select from '@mui/material/Select';
 import Grid from '@mui/material/Unstable_Grid2';
+import Stack from '@mui/material/Stack';
 
 const states = [
   { value: 'alabama', label: 'Alabama' },
@@ -20,6 +21,9 @@ const states = [
   { value: 'san-francisco', label: 'San Francisco' },
   { value: 'los-angeles', label: 'Los Angeles' },
 ] as const;
+
+const username = "NikolaLukic" as any;
+const email = "nikola.lukic@gmail.com" as any;
 
 export function AccountDetailsForm(): React.JSX.Element {
   return (
@@ -29,54 +33,35 @@ export function AccountDetailsForm(): React.JSX.Element {
       }}
     >
       <Card>
-        <CardHeader subheader="The information can be edited" title="Profile" />
+        <CardHeader subheader="The information can be edited" title="Account info" />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>First name</InputLabel>
-                <OutlinedInput defaultValue="Sofia" label="First name" name="firstName" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Last name</InputLabel>
-                <OutlinedInput defaultValue="Rivers" label="Last name" name="lastName" />
+                <InputLabel>Username</InputLabel>
+                <OutlinedInput defaultValue={username} label="Username" name="username" />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Email address</InputLabel>
-                <OutlinedInput defaultValue="sofia@devias.io" label="Email address" name="email" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Phone number</InputLabel>
-                <OutlinedInput label="Phone number" name="phone" type="tel" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>State</InputLabel>
-                <Select defaultValue="New York" label="State" name="state" variant="outlined">
-                  {states.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>City</InputLabel>
-                <OutlinedInput label="City" />
+                <OutlinedInput defaultValue={email} label="Email address" name="email" />
               </FormControl>
             </Grid>
           </Grid>
         </CardContent>
+        <Divider />
+        <Stack spacing={3} sx={{ maxWidth: 'sm' }} p={3}>
+          <FormControl fullWidth>
+            <InputLabel>Password</InputLabel>
+            <OutlinedInput label="Password" name="password" type="password" />
+          </FormControl>
+          <FormControl fullWidth>
+            <InputLabel>Confirm password</InputLabel>
+            <OutlinedInput label="Confirm password" name="confirmPassword" type="password" />
+          </FormControl>
+        </Stack>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
           <Button variant="contained">Save details</Button>
