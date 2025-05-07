@@ -46,36 +46,36 @@ export default function Page(): React.JSX.Element {
     setPage(0);
   }, [searchQuery]);
 
+  const fetchUsers = async () => {
+    try {
+      const params = new URLSearchParams({
+        page: (page + 1).toString(),
+        limit: rowsPerPage.toString(),
+        ...(searchQuery && { searchQuery: searchQuery })
+      });
+
+      const response = await fetch(`http://localhost:4000/users/reviewers?${params}`);
+      const data: ApiResponse = await response.json();
+
+      setUsers(data.data.map(user => ({
+        ...user,
+        // Transform to Customer type if needed
+        avatar: '', // Add default avatar or map from backend data
+        phone: '', // Add phone if available in backend
+        address: { // Add address if available in backend
+          city: '',
+          country: '',
+          state: '',
+          street: ''
+        }
+      })));
+      setCount(data.meta.total);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const params = new URLSearchParams({
-          page: (page + 1).toString(),
-          limit: rowsPerPage.toString(),
-          ...(searchQuery && { searchQuery: searchQuery })
-        });
-
-        const response = await fetch(`http://localhost:4000/users/reviewers?${params}`);
-        const data: ApiResponse = await response.json();
-
-        setUsers(data.data.map(user => ({
-          ...user,
-          // Transform to Customer type if needed
-          avatar: '', // Add default avatar or map from backend data
-          phone: '', // Add phone if available in backend
-          address: { // Add address if available in backend
-            city: '',
-            country: '',
-            state: '',
-            street: ''
-          }
-        })));
-        setCount(data.meta.total);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-
     fetchUsers();
   }, [page, rowsPerPage, searchQuery]);
 
@@ -104,6 +104,7 @@ export default function Page(): React.JSX.Element {
         page={page}
         rows={users}
         rowsPerPage={rowsPerPage}
+        refreshData={fetchUsers}
       />
       <Divider />
       <TablePagination

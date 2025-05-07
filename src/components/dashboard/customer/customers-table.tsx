@@ -31,6 +31,7 @@ interface CustomersTableProps {
   page?: number;
   rows?: Customer[];
   rowsPerPage?: number;
+  refreshData?: () => void;
 }
 
 export function CustomersTable({
@@ -38,6 +39,7 @@ export function CustomersTable({
   rows = [],
   page = 0,
   rowsPerPage = 0,
+  refreshData = () => {}
 }: CustomersTableProps): React.JSX.Element {
   const [openModal, setOpenModal] = React.useState(false);
   const [selectedCustomer, setSelectedCustomer] = React.useState<Customer | null>(null);
@@ -168,9 +170,19 @@ export function CustomersTable({
           )}
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'space-between', px: 4, py: 2 }}>
-          <Button color="error" variant="outlined" onClick={() => {
-            // Delete logic
-            setOpenModal(false);
+          <Button color="error" variant="outlined" onClick={async () => {
+            try {
+              await fetch(`http://localhost:4000/users/${selectedCustomer.id}`, {
+                method: 'DELETE',
+              });
+
+              console.log('User deleted');
+            } catch (error) {
+              console.error('Error deleting user:', error);
+            } finally {
+              setOpenModal(false);
+              refreshData();
+            }
           }}>
             Delete
           </Button>
@@ -178,9 +190,29 @@ export function CustomersTable({
             <Button onClick={() => setOpenModal(false)} sx={{ mr: 1 }}>
               Cancel
             </Button>
-            <Button variant="contained" onClick={() => {
-              // Save logic
-              setOpenModal(false);
+            <Button variant="contained" onClick={async () => {
+              try {
+                const { id, name, email, roles } = selectedCustomer;
+
+                await fetch(`http://localhost:4000/users/${id}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ name, email }),
+                });
+
+                await fetch(`http://localhost:4000/users/role/${id}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ roles }),
+                });
+
+                console.log('User updated successfully');
+              } catch (error) {
+                console.error('Error updating user:', error);
+              } finally {
+                setOpenModal(false);
+                refreshData();
+              }
             }}>
               Save Changes
             </Button>

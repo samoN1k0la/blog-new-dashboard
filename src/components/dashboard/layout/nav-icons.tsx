@@ -9,6 +9,8 @@ import { Note } from '@phosphor-icons/react/dist/ssr/Note';
 import { Shield } from '@phosphor-icons/react/dist/ssr/Shield';
 import { PenNibStraight } from '@phosphor-icons/react/dist/ssr/PenNibStraight';
 import { MagnifyingGlass } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
+import { PencilLine } from '@phosphor-icons/react/dist/ssr/PencilLine';
+import { Images } from '@phosphor-icons/react/dist/ssr/Images';
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,
@@ -19,6 +21,8 @@ export const navIcons = {
   'shield': Shield,
   'pencil-simple': PenNibStraight,
   'magnifying-glass': MagnifyingGlass,
+  'pencil-line': PencilLine,
+  'images': Images,
   user: UserIcon,
   users: UsersIcon,
 } as Record<string, Icon>;

@@ -27,22 +27,31 @@ export const navItems: NavSection[] = [
           { key: 'reviewers', title: 'Reviewers', href: paths.dashboard.reviewers, icon: 'magnifying-glass' },
         ],
       },
+      { key: 'posts', title: 'Posts', href: paths.dashboard.posts, icon: 'note' },
+      {
+        key: 'heroes',
+        title: 'Heroes',
+        href: paths.dashboard.posts,
+        icon: 'images',
+        items: [
+          { key: 'createHero', title: 'Create Hero', href: paths.dashboard.createHero, icon: 'pencil-line' },
+        ]
+      },
     ],
   },
   {
     label: 'Editor',
     items: [
-      { key: 'posts', title: 'Posts', href: paths.dashboard.posts, icon: 'note' },
-      { key: 'my-posts', title: 'My Posts', href: paths.dashboard.myPosts, icon: 'note' },
+      {
+        key: 'my-posts',
+        title: 'My Posts',
+        href: paths.dashboard.myPosts,
+        icon: 'note',
+        items: [
+          { key: 'createPost', title: 'Create Post', href: paths.dashboard.createPost, icon: 'pencil-line' },
+        ]
+      },
     ],
   },
 ];
 
-
-/*
-export const navItems = [
-  { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
-  { key: 'users', title: 'Users', href: paths.dashboard.users, icon: 'users' },
-  { key: 'posts', title: 'Posts', href: paths.dashboard.posts, icon: 'note' },
-  { key: 'my-posts', title: 'My Posts', href: paths.dashboard.myPosts, icon: 'note' },
-] satisfies NavItemConfig[];*/

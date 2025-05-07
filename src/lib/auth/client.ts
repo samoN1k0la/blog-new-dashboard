@@ -8,17 +8,8 @@ function generateToken(): string {
   return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
 }
 
-const user = {
-  id: 'USR-000',
-  avatar: '/assets/avatar.png',
-  firstName: 'Sofia',
-  lastName: 'Rivers',
-  email: 'sofia@devias.io',
-} satisfies User;
-
 export interface SignUpParams {
-  firstName: string;
-  lastName: string;
+  name: string
   email: string;
   password: string;
 }
@@ -37,14 +28,48 @@ export interface ResetPasswordParams {
 }
 
 class AuthClient {
-  async signUp(_: SignUpParams): Promise<{ error?: string }> {
-    // Make API request
+  async signUp(params: SignUpParams): Promise<{ error?: string }> {
+    try {
+      const registerRes = await fetch('http://localhost:4000/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: params.name,
+          email: params.email,
+          password: params.password,
+        }),
+      });
 
-    // We do not handle the API, so we'll just generate a token and store it in localStorage.
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
+      if (!registerRes.ok) {
+        const errorData = await registerRes.json();
+        return { error: errorData.message || 'Registration failed' };
+      }
 
-    return {};
+      const loginRes = await fetch('http://localhost:4000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: params.email,
+          password: params.password,
+        }),
+      });
+
+      if (!loginRes.ok) {
+        const errorData = await loginRes.json();
+        return { error: errorData.message || 'Auto-login after registration failed' };
+      }
+
+      const loginData = await loginRes.json();
+      localStorage.setItem('custom-auth-token', loginData.accessToken);
+
+      return {};
+    } catch (err) {
+      return { error: 'Network or server error during sign-up' };
+    }
   }
 
   async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
@@ -52,19 +77,29 @@ class AuthClient {
   }
 
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-    const { email, password } = params;
+    try {
+      const res = await fetch('http://localhost:4000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: params.email,
+          password: params.password,
+        }),
+      });
 
-    // Make API request
+      if (!res.ok) {
+        const errorData = await res.json();
+        return { error: errorData.message || 'Login failed' };
+      }
 
-    // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (email !== 'sofia@devias.io' || password !== 'Secret1') {
-      return { error: 'Invalid credentials' };
+      const data = await res.json();
+      localStorage.setItem('custom-auth-token', data.accessToken);
+      return {};
+    } catch (err) {
+      return { error: 'Network or server error during login' };
     }
-
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
-
-    return {};
   }
 
   async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
@@ -76,16 +111,36 @@ class AuthClient {
   }
 
   async getUser(): Promise<{ data?: User | null; error?: string }> {
-    // Make API request
-
-    // We do not handle the API, so just check if we have a token in localStorage.
     const token = localStorage.getItem('custom-auth-token');
 
     if (!token) {
       return { data: null };
     }
 
-    return { data: user };
+    try {
+      const res = await fetch('http://localhost:4000/auth/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          // Token invalid or expired
+          localStorage.removeItem('custom-auth-token');
+          return { data: null };
+        }
+
+        const errorData = await res.json();
+        return { error: errorData.message || 'Failed to fetch user' };
+      }
+
+      const userData: User = await res.json();
+      return { data: userData };
+    } catch (err) {
+      return { error: 'Network error while fetching user' };
+    }
   }
 
   async signOut(): Promise<{ error?: string }> {
