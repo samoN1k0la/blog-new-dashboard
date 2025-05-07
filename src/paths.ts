@@ -9,7 +9,7 @@ export const paths = {
     editors: '/dashboard/editors',
     reviewers: '/dashboard/reviewers',
     posts: '/404',
-    createPost: '/404',
+    createPost: '/dashboard/create-post',
     heroes: '/404',
     createHero: '/404',
     myPosts: '/404',
