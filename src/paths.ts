@@ -12,7 +12,7 @@ export const paths = {
     createPost: '/dashboard/create-post',
     heroes: '/404',
     createHero: '/404',
-    myPosts: '/404',
+    myPosts: '/dashboard/my-posts',
     settings: '/dashboard/settings',
   },
   errors: { notFound: '/errors/not-found' },
